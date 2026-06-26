@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package blog;
+
+service BlogService {
+  // Регистрация нового пользователя (unary)
+  rpc Register(RegisterRequest) returns (AuthResponse);
+  // Авторизация пользователя (unary)
+  rpc Login(LoginRequest) returns (AuthResponse);
+  // Создание поста (unary)
+  rpc CreatePost(CreatePostRequest) returns (PostResponse);
+  // Получение поста (unary)
+  rpc GetPost(GetPostRequest) returns (PostResponse);
+  // Обновление поста (unary)
+  rpc UpdatePost(UpdatePostRequest) returns (PostResponse);
+  // Удаление поста (unary)
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
+  // Получение списка постов (unary)
+  rpc ListPosts(ListPostsRequest) returns (ListPostsResponse);
+}
+
+message RegisterRequest {}
+
+message LoginRequest {}
+
+message AuthResponse {}
+
+message CreatePostRequest {}
+
+message PostResponse {}
+
+message GetPostRequest {}
+
+message UpdatePostRequest {}
+
+message DeletePostRequest {}
+
+message DeletePostResponse {}
+
+message ListPostsRequest {}
+
+message ListPostsResponse {}

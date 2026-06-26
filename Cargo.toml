@@ -1,3 +1,8 @@
 [workspace]
-members = ["blog-server", "blog-client", "blog-cli", "blog-wasm", "blog-proto"]
+members = ["blog-proto", "blog-server", "blog-client", "blog-cli", "blog-wasm"]
 resolver = "3"
+
+[workspace.dependencies]
+tonic = "0.14"
+prost = "0.14"
+tonic-prost = "0.14"

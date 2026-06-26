@@ -1,0 +1,22 @@
+services:
+  postgres:
+    container_name: blog_app_pg
+    image: postgres:18
+    command: -c 'max_connections=200'
+    restart: always
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: blog_app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - blog_app
+
+networks:
+  blog_app:
+    driver: bridge
