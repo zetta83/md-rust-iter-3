@@ -1,0 +1,3 @@
+[workspace]
+members = ["blog-server", "blog-client", "blog-cli", "blog-wasm", "blog-proto"]
+resolver = "3"
