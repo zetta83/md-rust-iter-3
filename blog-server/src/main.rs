@@ -12,7 +12,6 @@ use actix_cors::Cors;
 use actix_web::{App, HttpServer, middleware::Logger, web};
 use std::net::SocketAddr;
 use std::sync::Arc;
-use tracing::debug;
 
 mod application;
 mod data;
@@ -24,7 +23,6 @@ mod presentation;
 async fn main() -> std::io::Result<()> {
     let config = AppConfig::from_env().expect("Failed to read configuration from environment");
     init_logging();
-    debug!("cors_origins: {:?}", &config.cors_origins);
 
     let pg_pool = create_pool(config.database_url.as_str())
         .await
