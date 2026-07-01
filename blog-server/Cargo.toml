@@ -21,3 +21,4 @@ jsonwebtoken = { version = "10", features = ["use_pem", "ed25519-dalek", "rust_c
 argon2 = { version = "0.5", features = ["std"] }
 tokio = { version = "1", features = ["rt-multi-thread"] }
 tonic = { version = "0.14" }
+actix-cors = "0.7"

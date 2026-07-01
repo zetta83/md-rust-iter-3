@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use serde::Deserialize;
 use std::env;
+use tracing::debug;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct AppConfig {
