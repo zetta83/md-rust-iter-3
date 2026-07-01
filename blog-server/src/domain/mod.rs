@@ -1,4 +1,4 @@
-mod error;
-mod post;
-mod user;
 pub mod base;
+pub mod error;
+pub mod post;
+pub mod user;

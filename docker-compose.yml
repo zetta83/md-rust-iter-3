@@ -1,0 +1,8 @@
+include:
+  - path: blog-server/docker-compose.yml
+    env_file:
+      - ./.env
+
+networks:
+  blog_app_net:
+    driver: bridge

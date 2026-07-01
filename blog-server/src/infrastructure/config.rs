@@ -6,6 +6,8 @@ use std::env;
 pub struct AppConfig {
     pub host: String,
     pub port: u16,
+    pub grpc_host: String,
+    pub grpc_port: u16,
     pub database_url: String,
     pub jwt_secret: String,
     #[serde(default)]
@@ -17,10 +19,15 @@ impl AppConfig {
         dotenvy::dotenv().ok();
 
         let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".into());
+        let grpc_host = env::var("GRPC_HOST").unwrap_or_else(|_| "127.0.0.1".into());
         let port = env::var("PORT")
             .unwrap_or_else(|_| "8080".into())
             .parse()
             .map_err(|e| anyhow!("failed to parse port: {}", e))?;
+        let grpc_port = env::var("GRPC_PORT")
+            .unwrap_or_else(|_| "50051".into())
+            .parse()
+            .map_err(|e| anyhow!("failed to parse grpc_port: {}", e))?;
         let database_url =
             env::var("DATABASE_URL").map_err(|_| anyhow!("DATABASE_URL must be set"))?;
         let jwt_secret = env::var("JWT_SECRET").map_err(|_| anyhow!("JWT_SECRET must be set"))?;
@@ -35,6 +42,8 @@ impl AppConfig {
         Ok(Self {
             host,
             port,
+            grpc_host,
+            grpc_port,
             database_url,
             jwt_secret,
             cors_origins,

@@ -1,3 +1,6 @@
+use actix_web::http::StatusCode;
+use actix_web::{HttpResponse, ResponseError};
+use serde::Serialize;
 use sqlx;
 use thiserror::Error;
 
@@ -17,14 +20,55 @@ pub enum DomainError {
     NotFound(String),
 }
 
+#[derive(Serialize)]
+struct ErrorEnvelope<'a> {
+    error: &'a str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    details: Option<serde_json::Value>,
+}
+
+impl ResponseError for DomainError {
+    fn status_code(&self) -> StatusCode {
+        match self {
+            DomainError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            DomainError::Forbidden(_) => StatusCode::FORBIDDEN,
+            DomainError::NotFound(_) => StatusCode::NOT_FOUND,
+            DomainError::Validation(_) => StatusCode::BAD_REQUEST,
+            DomainError::AlreadyExists(_) => StatusCode::BAD_REQUEST,
+            DomainError::InvalidCredentials => StatusCode::UNAUTHORIZED,
+        }
+    }
+
+    fn error_response(&self) -> HttpResponse {
+        let message = self.to_string();
+        let details = match self {
+            DomainError::Forbidden(_) => None,
+            DomainError::NotFound(_) => None,
+            DomainError::Validation(_) => None,
+            DomainError::Internal(_) => None,
+            DomainError::AlreadyExists(_) => None,
+            DomainError::InvalidCredentials => None,
+        };
+
+        let payload = ErrorEnvelope {
+            error: &message,
+            details,
+        };
+
+        HttpResponse::build(self.status_code()).json(payload)
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum UserError {
-    #[error("user not found")]
-    NotFound,
+    #[error("user not found with id {0}")]
+    NotFound(String),
     #[error("user already exists")]
     AlreadyExists,
     #[error("server error {0}")]
     Internal(String),
+    #[error("invalid credentials")]
+    InvalidCredentials,
 }
 
 #[derive(Debug, Error)]
@@ -59,7 +103,7 @@ impl From<sqlx::Error> for PostError {
 impl From<sqlx::Error> for UserError {
     fn from(err: sqlx::Error) -> Self {
         match err {
-            sqlx::Error::RowNotFound => UserError::NotFound,
+            sqlx::Error::RowNotFound => UserError::NotFound("not found".into()),
             e => UserError::Internal(e.to_string()),
         }
     }
@@ -68,9 +112,10 @@ impl From<sqlx::Error> for UserError {
 impl From<UserError> for DomainError {
     fn from(err: UserError) -> Self {
         match err {
-            UserError::NotFound => DomainError::NotFound("user".into()),
+            UserError::NotFound(_) => DomainError::NotFound("user".into()),
             UserError::AlreadyExists => DomainError::AlreadyExists("user".into()),
             UserError::Internal(e) => DomainError::Internal(e),
+            UserError::InvalidCredentials => DomainError::InvalidCredentials,
         }
     }
 }

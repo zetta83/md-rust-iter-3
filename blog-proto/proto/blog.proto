@@ -2,41 +2,79 @@ syntax = "proto3";
 
 package blog;
 
+// JWT передаётся в метаданных запроса: Authorization: Bearer <token>
 service BlogService {
-  // Регистрация нового пользователя (unary)
   rpc Register(RegisterRequest) returns (AuthResponse);
-  // Авторизация пользователя (unary)
   rpc Login(LoginRequest) returns (AuthResponse);
-  // Создание поста (unary)
-  rpc CreatePost(CreatePostRequest) returns (PostResponse);
-  // Получение поста (unary)
-  rpc GetPost(GetPostRequest) returns (PostResponse);
-  // Обновление поста (unary)
-  rpc UpdatePost(UpdatePostRequest) returns (PostResponse);
-  // Удаление поста (unary)
-  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
-  // Получение списка постов (unary)
   rpc ListPosts(ListPostsRequest) returns (ListPostsResponse);
+  rpc GetPost(GetPostRequest) returns (PostResponse);
+  rpc CreatePost(CreatePostRequest) returns (PostResponse);   // требует JWT
+  rpc UpdatePost(UpdatePostRequest) returns (PostResponse);   // требует JWT
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse); // требует JWT
 }
 
-message RegisterRequest {}
+// ── Auth ─────────────────────────────────────────────────────────────────────
 
-message LoginRequest {}
+message RegisterRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
 
-message AuthResponse {}
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
 
-message CreatePostRequest {}
+message AuthResponse {
+  string token = 1;
+  User   user = 2;
+}
 
-message PostResponse {}
+message User {
+  int64                     id = 1;
+  string                    username = 2;
+  string                    email = 3;
+}
 
-message GetPostRequest {}
+// ── Posts ─────────────────────────────────────────────────────────────────────
 
-message UpdatePostRequest {}
+message ListPostsRequest {
+  uint32 page = 1; // default 0
+  uint32 limit = 2; // default 10
+}
 
-message DeletePostRequest {}
+message ListPostsResponse {
+  repeated PostResponse posts = 1;
+  int64                 total = 2;
+  uint32                limit = 3;
+  uint32                offset = 4;
+}
+
+message GetPostRequest {
+  int64 id = 1;
+}
+
+message CreatePostRequest {
+  string title = 1;
+  string content = 2;
+}
+
+message UpdatePostRequest {
+  int64  id = 1;
+  string title = 2;
+  string content = 3;
+}
+
+message DeletePostRequest {
+  int64 id = 1;
+}
 
 message DeletePostResponse {}
 
-message ListPostsRequest {}
-
-message ListPostsResponse {}
+message PostResponse {
+  int64  id = 1;
+  string title = 2;
+  string content = 3;
+  int64  author_id = 4;
+}
