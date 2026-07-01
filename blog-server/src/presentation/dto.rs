@@ -1,7 +1,6 @@
 use crate::domain::base::DeserializeString;
 use crate::domain::base::{Email, Password};
 use crate::domain::post::Post;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
