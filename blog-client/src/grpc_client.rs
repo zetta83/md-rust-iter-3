@@ -6,8 +6,8 @@ use blog_proto::blog::{
     CreatePostRequest, DeletePostRequest, GetPostRequest, ListPostsRequest, ListPostsResponse,
     LoginRequest, PostResponse, RegisterRequest, UpdatePostRequest, User,
 };
-use tonic::metadata::MetadataValue;
 use tonic::Request;
+use tonic::metadata::MetadataValue;
 
 pub struct GrpcClient {
     client: BlogServiceClient<tonic::transport::Channel>,
@@ -17,15 +17,18 @@ pub struct GrpcClient {
 impl GrpcClient {
     pub async fn connect(addr: String) -> Result<Self, BlogClientError> {
         let client = BlogServiceClient::connect(addr).await?;
-        Ok(Self { client, token: None })
+        Ok(Self {
+            client,
+            token: None,
+        })
     }
 
     pub fn set_token(&mut self, token: &str) {
         self.token = Some(token.to_string());
     }
-    
+
     pub fn get_token(&self) -> String {
-        self.token.clone().unwrap_or(String::new())
+        self.token.clone().unwrap_or_default()
     }
 
     fn authed<T>(&self, inner: T) -> Result<Request<T>, BlogClientError> {
@@ -42,33 +45,59 @@ impl GrpcClient {
 
 #[async_trait]
 impl BlogApi for GrpcClient {
-    async fn register(&mut self, username: &str, email: &str, password: &str) -> Result<User, BlogClientError> {
-        let res = self.client.register(RegisterRequest {
-            username: username.into(),
-            email: email.into(),
-            password: password.into(),
-        }).await.map_err(BlogClientError::from)?.into_inner();
+    async fn register(
+        &mut self,
+        username: &str,
+        email: &str,
+        password: &str,
+    ) -> Result<User, BlogClientError> {
+        let res = self
+            .client
+            .register(RegisterRequest {
+                username: username.into(),
+                email: email.into(),
+                password: password.into(),
+            })
+            .await
+            .map_err(BlogClientError::from)?
+            .into_inner();
 
         self.token = Some(res.token);
-        res.user.ok_or_else(|| BlogClientError::Internal("missing user in response".to_string()))
+        res.user
+            .ok_or_else(|| BlogClientError::Internal("missing user in response".to_string()))
     }
 
     async fn login(&mut self, username: &str, password: &str) -> Result<User, BlogClientError> {
-        let res = self.client.login(LoginRequest {
-            username: username.into(),
-            password: password.into(),
-        }).await.map_err(BlogClientError::from)?.into_inner();
+        let res = self
+            .client
+            .login(LoginRequest {
+                username: username.into(),
+                password: password.into(),
+            })
+            .await
+            .map_err(BlogClientError::from)?
+            .into_inner();
 
         self.token = Some(res.token);
-        res.user.ok_or_else(|| BlogClientError::Internal("missing user in response".to_string()))
+        res.user
+            .ok_or_else(|| BlogClientError::Internal("missing user in response".to_string()))
     }
 
-    async fn create_post(&mut self, title: &str, content: &str) -> Result<PostResponse, BlogClientError> {
+    async fn create_post(
+        &mut self,
+        title: &str,
+        content: &str,
+    ) -> Result<PostResponse, BlogClientError> {
         let req = self.authed(CreatePostRequest {
             title: title.into(),
             content: content.into(),
         })?;
-        Ok(self.client.create_post(req).await.map_err(BlogClientError::from)?.into_inner())
+        Ok(self
+            .client
+            .create_post(req)
+            .await
+            .map_err(BlogClientError::from)?
+            .into_inner())
     }
 
     async fn get_post(&mut self, id: i64) -> Result<Option<PostResponse>, BlogClientError> {
@@ -79,26 +108,47 @@ impl BlogApi for GrpcClient {
         }
     }
 
-    async fn update_post(&mut self, id: i64, title: &str, content: &str) -> Result<PostResponse, BlogClientError> {
+    async fn update_post(
+        &mut self,
+        id: i64,
+        title: &str,
+        content: &str,
+    ) -> Result<PostResponse, BlogClientError> {
         let req = self.authed(UpdatePostRequest {
             id,
             title: title.into(),
             content: content.into(),
         })?;
-        Ok(self.client.update_post(req).await.map_err(BlogClientError::from)?.into_inner())
+        Ok(self
+            .client
+            .update_post(req)
+            .await
+            .map_err(BlogClientError::from)?
+            .into_inner())
     }
 
     async fn delete_post(&mut self, id: i64) -> Result<(), BlogClientError> {
         let req = self.authed(DeletePostRequest { id })?;
-        self.client.delete_post(req).await.map_err(BlogClientError::from)?;
+        self.client
+            .delete_post(req)
+            .await
+            .map_err(BlogClientError::from)?;
         Ok(())
     }
 
-    async fn list_posts(&mut self, limit: Option<u32>, offset: Option<u32>) -> Result<ListPostsResponse, BlogClientError> {
-        let res = self.client.list_posts(ListPostsRequest {
-            page: offset.unwrap_or(0),
-            limit: limit.unwrap_or(10),
-        }).await.map_err(BlogClientError::from)?;
+    async fn list_posts(
+        &mut self,
+        limit: Option<u32>,
+        offset: Option<u32>,
+    ) -> Result<ListPostsResponse, BlogClientError> {
+        let res = self
+            .client
+            .list_posts(ListPostsRequest {
+                page: offset.unwrap_or(0),
+                limit: limit.unwrap_or(10),
+            })
+            .await
+            .map_err(BlogClientError::from)?;
         Ok(res.into_inner())
     }
 }

@@ -36,7 +36,7 @@ impl HttpClient {
     }
 
     pub fn get_token(&self) -> String {
-        self.token.clone().unwrap_or(String::new())
+        self.token.clone().unwrap_or_default()
     }
 
     async fn check_status(res: reqwest::Response) -> Result<reqwest::Response, BlogClientError> {

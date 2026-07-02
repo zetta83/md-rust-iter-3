@@ -27,7 +27,7 @@ async fn handler_get_list_posts(
             .get_list_posts(page, limit)
             .await?
             .into_iter()
-            .map(|p| PostResponse::from(p))
+            .map(PostResponse::from)
             .collect(),
         total: blog_srv.get_posts_count().await?,
         limit,

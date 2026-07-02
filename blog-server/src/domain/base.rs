@@ -13,7 +13,7 @@ where
     where
         D: Deserializer<'de>,
     {
-        Ok(Self::new(String::deserialize(d)?).map_err(D::Error::custom)?)
+        Self::new(String::deserialize(d)?).map_err(D::Error::custom)
     }
 }
 
@@ -33,15 +33,15 @@ impl DeserializeString for Email {
     }
 }
 
-impl Into<Email> for String {
-    fn into(self) -> Email {
-        Email(self)
+impl From<String> for Email {
+    fn from(val: String) -> Self {
+        Self(val)
     }
 }
 
-impl Into<String> for Email {
-    fn into(self) -> String {
-        self.0
+impl From<Email> for String {
+    fn from(val: Email) -> Self {
+        val.0
     }
 }
 
@@ -64,9 +64,9 @@ impl DeserializeString for Password {
     }
 }
 
-impl Into<Password> for String {
-    fn into(self) -> Password {
-        Password(self)
+impl From<String> for Password {
+    fn from(val: String) -> Self {
+        Self(val)
     }
 }
 
@@ -85,9 +85,9 @@ impl Default for PaginationLimit {
     }
 }
 
-impl Into<PaginationLimit> for i64 {
-    fn into(self) -> PaginationLimit {
-        PaginationLimit(self)
+impl From<i64> for PaginationLimit {
+    fn from(limit: i64) -> Self {
+        Self(limit)
     }
 }
 

@@ -1,3 +1,5 @@
+use actix_cors::Cors;
+use actix_web::{App, HttpServer, middleware::Logger, web};
 use blog_server::application::auth_service::AuthService;
 use blog_server::application::blog_service::BlogService;
 use blog_server::data::pg_repository::PgRepository;
@@ -9,8 +11,6 @@ use blog_server::infrastructure::jwt::JwtKeys;
 use blog_server::infrastructure::logging::init_logging;
 use blog_server::presentation::grpc_service::BlogServiceImpl;
 use blog_server::presentation::http_handlers;
-use actix_cors::Cors;
-use actix_web::{App, HttpServer, middleware::Logger, web};
 use std::net::SocketAddr;
 use std::sync::Arc;
 
@@ -57,10 +57,12 @@ async fn run_grpc_server(
     );
 
     Server::builder()
-        .add_service(BlogServiceServer::new(BlogServiceImpl::new(auth_srv, blog_srv)))
+        .add_service(BlogServiceServer::new(BlogServiceImpl::new(
+            auth_srv, blog_srv,
+        )))
         .serve(addr)
         .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
+        .map_err(std::io::Error::other)
 }
 
 async fn run_rest_server(

@@ -42,7 +42,6 @@ impl<R: ?Sized + UserRepository + 'static> AuthService<R> {
         self.repo
             .create(User::new(username, email, password.0))
             .await
-            .map_err(UserError::from)
     }
 
     #[instrument(skip(self))]
@@ -52,7 +51,7 @@ impl<R: ?Sized + UserRepository + 'static> AuthService<R> {
             .find_by_username(username.as_str())
             .await
             .map_err(|_| UserError::InvalidCredentials)?
-            .ok_or_else(|| UserError::InvalidCredentials)?;
+            .ok_or(UserError::InvalidCredentials)?;
         if verify_password(password.as_str(), &user.password_hash)
             .map_err(|_| UserError::InvalidCredentials)?
         {
@@ -73,8 +72,7 @@ impl<R: ?Sized + UserRepository + 'static> AuthService<R> {
     pub async fn get_user(&self, id: i64) -> Result<User, UserError> {
         self.repo
             .find_by_id(id)
-            .await
-            .map_err(UserError::from)?
+            .await?
             .ok_or_else(|| UserError::NotFound(id.to_string()))
     }
 }

@@ -1,3 +1,5 @@
+use crate::application::auth_service::{AuthService, extract_user_from_token};
+use crate::data::user_repository::UserRepository;
 use crate::infrastructure::jwt::JwtKeys;
 use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
 use actix_web::{Error, HttpMessage, web};
@@ -6,8 +8,6 @@ use std::cell::RefCell;
 use std::future::{Ready, ready};
 use std::rc::Rc;
 use std::task::{Context, Poll};
-use crate::application::auth_service::{extract_user_from_token, AuthService};
-use crate::data::user_repository::UserRepository;
 
 pub struct JwtAuthMiddleware {
     keys: JwtKeys,
@@ -87,7 +87,7 @@ where
                 svc.call(req)
             };
 
-            Ok(fut.await?)
+            fut.await
         })
     }
 }
