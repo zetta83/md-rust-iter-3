@@ -23,6 +23,10 @@ impl GrpcClient {
     pub fn set_token(&mut self, token: &str) {
         self.token = Some(token.to_string());
     }
+    
+    pub fn get_token(&self) -> String {
+        self.token.clone().unwrap_or(String::new())
+    }
 
     fn authed<T>(&self, inner: T) -> Result<Request<T>, BlogClientError> {
         let mut req = Request::new(inner);

@@ -1,23 +1,18 @@
-use crate::application::auth_service::AuthService;
-use crate::application::blog_service::BlogService;
-use crate::data::pg_repository::PgRepository;
-use crate::data::post_repository::PostRepository;
-use crate::data::user_repository::UserRepository;
-use crate::infrastructure::config::AppConfig;
-use crate::infrastructure::database::{create_pool, run_migrations};
-use crate::infrastructure::jwt::JwtKeys;
-use crate::infrastructure::logging::init_logging;
-use crate::presentation::grpc_service::BlogServiceImpl;
+use blog_server::application::auth_service::AuthService;
+use blog_server::application::blog_service::BlogService;
+use blog_server::data::pg_repository::PgRepository;
+use blog_server::data::post_repository::PostRepository;
+use blog_server::data::user_repository::UserRepository;
+use blog_server::infrastructure::config::AppConfig;
+use blog_server::infrastructure::database::{create_pool, run_migrations};
+use blog_server::infrastructure::jwt::JwtKeys;
+use blog_server::infrastructure::logging::init_logging;
+use blog_server::presentation::grpc_service::BlogServiceImpl;
+use blog_server::presentation::http_handlers;
 use actix_cors::Cors;
 use actix_web::{App, HttpServer, middleware::Logger, web};
 use std::net::SocketAddr;
 use std::sync::Arc;
-
-mod application;
-mod data;
-mod domain;
-mod infrastructure;
-mod presentation;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -62,9 +57,7 @@ async fn run_grpc_server(
     );
 
     Server::builder()
-        .add_service(BlogServiceServer::new(BlogServiceImpl::new(
-            auth_srv, blog_srv,
-        )))
+        .add_service(BlogServiceServer::new(BlogServiceImpl::new(auth_srv, blog_srv)))
         .serve(addr)
         .await
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
@@ -83,7 +76,7 @@ async fn run_rest_server(
             .wrap(build_cors(&config_data))
             .app_data(web::Data::new(auth_srv.clone()))
             .app_data(web::Data::new(blog_srv.clone()))
-            .configure(presentation::http_handlers::configure(auth_srv.keys()))
+            .configure(http_handlers::configure(auth_srv.keys()))
     })
     .bind((config.host.as_str(), config.port))?
     .run()

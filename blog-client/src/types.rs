@@ -35,6 +35,13 @@ impl BlogClient {
             BlogClient::Grpc(c) => c.set_token(token),
         }
     }
+    
+    pub fn get_token(&self) -> String {
+        match self {
+            BlogClient::Http(c) => c.get_token(),
+            BlogClient::Grpc(c) => c.get_token(),
+        }
+    }
 }
 
 #[async_trait]

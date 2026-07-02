@@ -35,6 +35,10 @@ impl HttpClient {
         self.token = Some(token.to_string());
     }
 
+    pub fn get_token(&self) -> String {
+        self.token.clone().unwrap_or(String::new())
+    }
+
     async fn check_status(res: reqwest::Response) -> Result<reqwest::Response, BlogClientError> {
         let status = res.status();
         if status.is_success() {
@@ -72,13 +76,16 @@ impl BlogApi for HttpClient {
         let res = self
             .client
             .post(format!("{}/auth/register", self.base_url))
-            .json(&serde_json::json!({ "username": username, "email": email, "password": password }))
+            .json(
+                &serde_json::json!({ "username": username, "email": email, "password": password }),
+            )
             .send()
             .await?;
 
         let auth: AuthResponse = Self::check_status(res).await?.json().await?;
         self.token = Some(auth.token);
-        auth.user.ok_or_else(|| BlogClientError::Internal("missing user in response".to_string()))
+        auth.user
+            .ok_or_else(|| BlogClientError::Internal("missing user in response".to_string()))
     }
 
     async fn login(&mut self, username: &str, password: &str) -> Result<User, BlogClientError> {
@@ -91,7 +98,8 @@ impl BlogApi for HttpClient {
 
         let auth: AuthResponse = Self::check_status(res).await?.json().await?;
         self.token = Some(auth.token);
-        auth.user.ok_or_else(|| BlogClientError::Internal("missing user in response".to_string()))
+        auth.user
+            .ok_or_else(|| BlogClientError::Internal("missing user in response".to_string()))
     }
 
     async fn list_posts(

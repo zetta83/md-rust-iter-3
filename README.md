@@ -9,7 +9,7 @@
 | [`blog-server`](./blog-server) | HTTP + gRPC сервер, PostgreSQL | Готово |
 | [`blog-proto`](./blog-proto) | Protobuf-определения и Tonic-код | Готово |
 | [`blog-client`](./blog-client) | Клиентская библиотека: HTTP + gRPC | Готово |
-| `blog-cli` | CLI-инструмент | Заглушка |
+| [`blog-cli`](./blog-cli) | CLI-инструмент | Готово |
 | `blog-wasm` | WASM-фронтенд | Заглушка |
 
 ## Быстрый старт
