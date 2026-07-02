@@ -19,8 +19,8 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    let token = use_signal(|| storage::load_token());
-    let user = use_signal(|| storage::load_user());
+    let token = use_signal(storage::load_token);
+    let user = use_signal(storage::load_user);
     let refresh = use_signal(|| 0u32);
 
     use_context_provider(|| AppCtx {
