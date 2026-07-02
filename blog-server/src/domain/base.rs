@@ -90,3 +90,69 @@ impl Into<PaginationLimit> for i64 {
         PaginationLimit(self)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // --- Email ---
+
+    #[test]
+    fn email_valid() {
+        assert!(Email::new("user@example.com".to_string()).is_ok());
+    }
+
+    #[test]
+    fn email_lowercased_on_create() {
+        let email = Email::new("User@Example.COM".to_string()).unwrap();
+        assert_eq!(email.0, "user@example.com");
+    }
+
+    #[test]
+    fn email_too_short() {
+        // "a@b.c" — 5 символов, меньше минимума
+        let err = Email::new("a@b.c".to_string()).unwrap_err();
+        assert!(matches!(err, DomainError::Validation(_)));
+    }
+
+    #[test]
+    fn email_missing_at() {
+        let err = Email::new("noemail.com".to_string()).unwrap_err();
+        assert!(matches!(err, DomainError::Validation(_)));
+    }
+
+    #[test]
+    fn email_boundary_exactly_6_chars() {
+        // "a@b.cd" — 6 символов, должен пройти
+        assert!(Email::new("a@b.cd".to_string()).is_ok());
+    }
+
+    // --- Password ---
+
+    #[test]
+    fn password_too_short() {
+        let err = Password::new("short".to_string()).unwrap_err();
+        assert!(matches!(err, DomainError::Validation(_)));
+    }
+
+    #[test]
+    fn password_exactly_8_chars() {
+        assert!(Password::new("12345678".to_string()).is_ok());
+    }
+
+    #[test]
+    fn password_is_hashed_on_create() {
+        let pwd = Password::new("mysecretpass".to_string()).unwrap();
+        // хранится Argon2id-хеш, а не сам пароль
+        assert!(pwd.0.starts_with("$argon2"));
+        assert_ne!(pwd.0, "mysecretpass");
+    }
+
+    #[test]
+    fn password_two_hashes_differ() {
+        // Argon2id использует случайную соль, поэтому хеши одного пароля не совпадают
+        let a = Password::new("samepassword".to_string()).unwrap();
+        let b = Password::new("samepassword".to_string()).unwrap();
+        assert_ne!(a.0, b.0);
+    }
+}

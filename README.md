@@ -6,9 +6,9 @@
 
 | Крейт | Описание | Статус |
 |-------|----------|--------|
-| [`blog-server`](./blog-server) | HTTP + gRPC сервер, PostgreSQL | В разработке |
+| [`blog-server`](./blog-server) | HTTP + gRPC сервер, PostgreSQL | Готово |
 | [`blog-proto`](./blog-proto) | Protobuf-определения и Tonic-код | Готово |
-| `blog-client` | HTTP-клиентская библиотека | Заглушка |
+| [`blog-client`](./blog-client) | Клиентская библиотека: HTTP + gRPC | Готово |
 | `blog-cli` | CLI-инструмент | Заглушка |
 | `blog-wasm` | WASM-фронтенд | Заглушка |
 

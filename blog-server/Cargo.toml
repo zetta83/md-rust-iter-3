@@ -5,20 +5,20 @@ edition = "2024"
 
 [dependencies]
 blog-proto = { path = "../blog-proto" }
-chrono = { version = "0.4", features = ["serde"] }
-serde = { version = "1", features = ["derive"] }
-thiserror = "2"
-anyhow = "1"
+chrono = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
 sqlx = { version = "0.9", features = ["json", "uuid", "chrono", "postgres", "runtime-tokio"] }
 actix-web = "4"
-serde_json = "1"
+serde_json = { workspace = true }
 dotenvy = "0.15"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "chrono"] }
 futures-util = "0.3"
-async-trait = "0.1"
+async-trait = { workspace = true }
 jsonwebtoken = { version = "10", features = ["use_pem", "ed25519-dalek", "rust_crypto"] }
 argon2 = { version = "0.5", features = ["std"] }
-tokio = { version = "1", features = ["rt-multi-thread"] }
-tonic = { version = "0.14" }
+tokio = { workspace = true }
+tonic = { workspace = true }
 actix-cors = "0.7"

@@ -66,3 +66,62 @@ pub fn verify_password(password: &str, hash: &str) -> Result<bool, argon2::passw
         .verify_password(password.as_bytes(), &parsed_hash)
         .is_ok())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // --- JWT ---
+
+    #[test]
+    fn jwt_generate_and_verify_round_trip() {
+        let keys = JwtKeys::new("test-secret".to_string());
+        let token = keys.generate_token("42").unwrap();
+        let claims = keys.verify_token(&token).unwrap();
+        assert_eq!(claims.sub, "42");
+    }
+
+    #[test]
+    fn jwt_verify_rejects_wrong_secret() {
+        let keys = JwtKeys::new("secret-a".to_string());
+        let token = keys.generate_token("1").unwrap();
+
+        let other = JwtKeys::new("secret-b".to_string());
+        assert!(other.verify_token(&token).is_err());
+    }
+
+    #[test]
+    fn jwt_verify_rejects_garbage() {
+        let keys = JwtKeys::new("secret".to_string());
+        assert!(keys.verify_token("not.a.token").is_err());
+    }
+
+    #[test]
+    fn jwt_claims_contain_sub() {
+        let keys = JwtKeys::new("s".to_string());
+        let token = keys.generate_token("user-99").unwrap();
+        let claims = keys.verify_token(&token).unwrap();
+        assert_eq!(claims.sub, "user-99");
+        assert!(claims.exp > claims.iat);
+    }
+
+    // --- Argon2 ---
+
+    #[test]
+    fn password_hash_and_verify_correct() {
+        let hash = hash_password("correcthorse").unwrap();
+        assert!(verify_password("correcthorse", &hash).unwrap());
+    }
+
+    #[test]
+    fn password_verify_wrong_password() {
+        let hash = hash_password("correcthorse").unwrap();
+        assert!(!verify_password("wronghorse", &hash).unwrap());
+    }
+
+    #[test]
+    fn password_hash_format_is_argon2() {
+        let hash = hash_password("anypassword").unwrap();
+        assert!(hash.starts_with("$argon2"));
+    }
+}
