@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-
-[lib]
-crate-type = ["cdylib"]
+dioxus = { version = "0.7", features = ["web"] }
+blog-dto = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+gloo-storage = "0.3"

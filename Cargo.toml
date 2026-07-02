@@ -1,8 +1,9 @@
 [workspace]
-members = ["blog-proto", "blog-server", "blog-client", "blog-cli", "blog-wasm"]
+members = ["blog-proto", "blog-server", "blog-client", "blog-cli", "blog-wasm", "blog-dto"]
 resolver = "3"
 
 [workspace.dependencies]
+blog-dto = { path = "./blog-dto" }
 tonic = "0.14"
 prost = "0.14"
 tonic-prost = "0.14"

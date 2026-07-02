@@ -1,0 +1,84 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ── Server: release binary ────────────────────────────────────────────────────
+  build-server:
+    name: Build Server
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: blog_app
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost/blog_app
+      JWT_SECRET: ci-secret
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install sqlx-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: sqlx-cli@0.9
+
+      - name: Run migrations
+        run: sqlx migrate run --source blog-server/migrations
+
+      - name: Build release
+        run: cargo build -p blog_server --release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blog-server-linux-x86_64
+          path: target/release/blog_server
+          retention-days: 30
+
+  # ── WASM frontend: trunk build ────────────────────────────────────────────────
+  build-wasm:
+    name: Build WASM Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install trunk
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
+
+      - name: Build WASM
+        working-directory: blog-wasm
+        run: trunk build --release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: blog-wasm-dist
+          path: blog-wasm/dist/
+          retention-days: 30

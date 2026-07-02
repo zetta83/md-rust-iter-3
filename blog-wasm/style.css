@@ -1,0 +1,307 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+}
+
+header {
+    background: #1a1a2e;
+    color: white;
+    padding: 0.9rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+}
+
+#auth-status {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+#btn-logout {
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+#btn-logout:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+main {
+    max-width: 960px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: 290px 1fr;
+    gap: 1.5rem;
+}
+
+.panel {
+    background: white;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1rem;
+}
+
+.panel h2 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #1a1a2e;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.4rem;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.tab-btn.active {
+    background: #1a1a2e;
+    color: white;
+    border-color: #1a1a2e;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+    margin: 0.6rem 0 0.2rem;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+input:focus, textarea:focus {
+    border-color: #1a1a2e;
+}
+
+textarea {
+    height: 90px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.btn-primary {
+    display: block;
+    width: 100%;
+    margin-top: 0.9rem;
+    padding: 0.55rem;
+    background: #1a1a2e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    transition: background 0.15s;
+}
+
+.btn-primary:hover {
+    background: #16213e;
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.msg {
+    font-size: 0.82rem;
+    margin-top: 0.5rem;
+    min-height: 1.1em;
+}
+
+.msg.error {
+    color: #c0392b;
+}
+
+.msg.ok {
+    color: #27ae60;
+}
+
+.posts-col h2 {
+    font-size: 1rem;
+    color: #1a1a2e;
+    margin-bottom: 1rem;
+}
+
+.post-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.1rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 0.9rem;
+}
+
+.post-card .post-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+}
+
+.post-card .post-meta {
+    font-size: 0.75rem;
+    color: #999;
+    margin-bottom: 0.6rem;
+}
+
+.post-card .post-body {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.post-card .post-actions {
+    margin-top: 0.7rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.65rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    border: 1px solid;
+}
+
+.btn-edit {
+    background: #eaf4fd;
+    border-color: #3498db;
+    color: #2980b9;
+}
+
+.btn-edit:hover {
+    background: #3498db;
+    color: white;
+}
+
+.btn-del {
+    background: #fdecea;
+    border-color: #e74c3c;
+    color: #c0392b;
+}
+
+.btn-del:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-save {
+    background: #1a1a2e;
+    border-color: #1a1a2e;
+    color: white;
+}
+
+.btn-cancel {
+    background: #f0f0f0;
+    border-color: #ccc;
+    color: #555;
+}
+
+.edit-area {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #eee;
+    display: none;
+}
+
+.edit-area.open {
+    display: block;
+}
+
+.edit-area input {
+    margin-bottom: 0.4rem;
+}
+
+.edit-btns {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.edit-msg {
+    font-size: 0.8rem;
+    color: #c0392b;
+    margin-top: 0.3rem;
+    min-height: 1em;
+}
+
+.pagination {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.pagination button {
+    padding: 0.3rem 0.65rem;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.82rem;
+}
+
+.pagination button.cur {
+    background: #1a1a2e;
+    color: white;
+    border-color: #1a1a2e;
+}
+
+.empty {
+    text-align: center;
+    color: #aaa;
+    padding: 2.5rem 0;
+    font-size: 0.9rem;
+}
+
+.hidden {
+    display: none !important;
+}

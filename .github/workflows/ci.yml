@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  # ── Native crates (blog-server, blog-client, blog-cli, blog-proto, blog-dto) ──
+  check:
+    name: Check & Clippy
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: blog_app
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost/blog_app
+      JWT_SECRET: ci-secret
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install sqlx-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: sqlx-cli@0.9
+
+      - name: Run migrations
+        run: sqlx migrate run --source blog-server/migrations
+
+      - name: cargo check
+        run: cargo check --workspace --exclude blog-wasm
+
+      - name: cargo clippy
+        run: cargo clippy --workspace --exclude blog-wasm -- -D warnings
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: check
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: blog_app
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost/blog_app
+      JWT_SECRET: ci-secret
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Install sqlx-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: sqlx-cli@0.9
+
+      - name: Run migrations
+        run: sqlx migrate run --source blog-server/migrations
+
+      - name: cargo test
+        run: cargo test --workspace --exclude blog-wasm
+
+  # ── WASM crate (blog-wasm) ────────────────────────────────────────────────────
+  check-wasm:
+    name: Check WASM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo check (wasm32)
+        run: cargo check -p blog-wasm --target wasm32-unknown-unknown
+
+      - name: cargo clippy (wasm32)
+        run: cargo clippy -p blog-wasm --target wasm32-unknown-unknown -- -D warnings

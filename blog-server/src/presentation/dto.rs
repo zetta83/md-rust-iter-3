@@ -1,7 +1,9 @@
 use crate::domain::base::DeserializeString;
 use crate::domain::base::{Email, Password};
 use crate::domain::post::Post;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+
+pub use blog_dto::{AuthResponse, ListPostsResponse, PostResponse, User};
 
 #[derive(Debug, Deserialize)]
 pub struct RegisterRequest {
@@ -18,19 +20,6 @@ pub struct LoginRequest {
     pub password: String,
 }
 
-#[derive(Debug, Serialize)]
-pub struct AuthResponse {
-    pub token: String,
-    pub user: User,
-}
-
-#[derive(Debug, Serialize)]
-pub struct User {
-    pub id: i64,
-    pub username: String,
-    pub email: String,
-}
-
 #[derive(Debug, Deserialize)]
 pub struct PostCreateRequest {
     pub title: String,
@@ -41,22 +30,6 @@ pub struct PostCreateRequest {
 pub struct PaginationQuery {
     pub page: Option<u32>,
     pub limit: Option<u32>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ListPostsResponse {
-    pub posts: Vec<PostResponse>,
-    pub total: i64,
-    pub limit: u32,
-    pub offset: u32,
-}
-
-#[derive(Debug, Serialize)]
-pub struct PostResponse {
-    pub id: i64,
-    pub title: String,
-    pub content: String,
-    pub author_id: i64,
 }
 
 impl From<Post> for PostResponse {

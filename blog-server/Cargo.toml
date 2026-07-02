@@ -8,6 +8,7 @@ testing = []
 
 [dependencies]
 blog-proto = { path = "../blog-proto" }
+blog-dto = { workspace = true }
 chrono = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
